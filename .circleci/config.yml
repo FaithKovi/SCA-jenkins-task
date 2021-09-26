@@ -1,0 +1,27 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.8
+    steps:
+      - checkout
+      - restore_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
+      - run:
+          command: |
+            python3 -m venv env
+            . venv/bin/activate
+            pip3 install -r requirements.txt
+      - save_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
+          paths:
+            - "env"
+      - run:
+          name: Running provided tests
+          command: |
+            . env/bin/activate
+            python3 hello.test.py
+      - store_artifacts:
+          path: reports/
+          destination: SCA-jenkins-task
+      
